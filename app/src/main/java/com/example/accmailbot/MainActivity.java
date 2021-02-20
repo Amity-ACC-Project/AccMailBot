@@ -1,10 +1,13 @@
 package com.example.accmailbot;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.util.Base64;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,13 +28,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView textView=findViewById(R.id.txt);
+         TextView textView=(TextView) findViewById(R.id.txt);
         enSchema schema=new enSchema("harshsinghrajawat86@gmail.com","Test","<h1>Hi</h1> From Java");
 
         byte[] msg=schema.getStruct();
         String en=Base64.encodeToString(msg,Base64.CRLF);
         textView.setText(en);
         Log.i("MainActivity: ",  en);
+        AsyncCode Task=new AsyncCode();
+        Task.execute();
 
 
        /* Properties properties=new Properties();
@@ -52,4 +57,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this,"Msg Sent Successfully",Toast.LENGTH_SHORT).show();
         textView.setText("Msg Sent Successfully");*/
     }
+
+
 }

@@ -3,12 +3,15 @@ package com.example.accmailbot;
 import android.provider.BaseColumns;
 import android.util.Base64;
 
+import java.net.URL;
+
 public class enSchema {
     public enSchema(String Email,String Subject,String Body){email=Email;subject=Subject;body=Body;}
 
     public static String email ="";
     public static String subject="";
     public static String body="";
+
 
     public byte[] getStruct(){
          String Content_struct="Content-Type: text/html; charset=\"UTF-8\"\n" +
