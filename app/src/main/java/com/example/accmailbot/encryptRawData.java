@@ -1,10 +1,9 @@
 package com.example.accmailbot;
 
 import android.util.Base64;
-import android.util.Log;
+import com.example.accmailbot.UserDetails;
 
 public class encryptRawData {
-
 
     public static String email ="";
     public static String subject="";
@@ -24,11 +23,7 @@ public class encryptRawData {
                 body+"";
 
         byte[] msg=Content_struct.getBytes();
-        Log.i("GetByte: ",msg+"");
         String en=Base64.encodeToString(msg,Base64.CRLF);
-
-        en=en.replace("\r\n","");
         UserDetails.raw_data=en;
-        Log.i("RawData:",en);
     }
 }

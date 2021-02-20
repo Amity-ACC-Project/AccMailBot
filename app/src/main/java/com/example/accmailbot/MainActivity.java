@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import static com.example.accmailbot.encryptRawData.encryptData;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -16,12 +18,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
          TextView textView=(TextView) findViewById(R.id.txt);
-        enSchema schema=new enSchema("harshsinghrajawat86@gmail.com","Test","<h1>Hi</h1> From Java");
+        encryptData("harshsinghrajawat86@gmail.com","Test","<h1>Hi</h1> From Java");
 
-        byte[] msg=schema.getStruct();
-        String en=Base64.encodeToString(msg,Base64.CRLF);
-        textView.setText(en);
-        Log.i("MainActivity: ",  en);
+
+        textView.setText(UserDetails.raw_data);
         AsyncGetToken Task=new AsyncGetToken();
         Task.execute();
 

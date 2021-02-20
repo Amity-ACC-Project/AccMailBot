@@ -10,4 +10,6 @@ public class UserDetails {
     public static final String client_secret="yzH0WYH68JXWIjuNvBLcX4Oy";
     public static final String refresh_token="1//04KtKnUcd16M4CgYIARAAGAQSNwF-L9IrUoIF6HU7BthQIW8Ny6zqp0y0gWhF5KxC8IIpIxSsfay7lxH4CDdNOAFsCee6rBuudcw";
     public static String access_token="";
+    public static String raw_data="";
+
 }
