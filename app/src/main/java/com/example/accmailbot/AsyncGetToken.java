@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,9 +20,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import com.example.accmailbot.MainActivity.*;
+import com.example.accmailbot.UserDetails;
 
-public class AsyncCode extends AsyncTask<URL,Void,String> {
+public class AsyncGetToken extends AsyncTask<URL,Void,String> {
 
     @Override
     protected void onPreExecute() {
@@ -34,7 +35,8 @@ public class AsyncCode extends AsyncTask<URL,Void,String> {
         if(s==null){
             return ;
         }else {
-            Log.i("AsyncResults: ",  s);
+            UserDetails.access_token=s;
+            Log.i("AsyncResults: ",  UserDetails.access_token);
         }
     }
 
@@ -46,11 +48,10 @@ public class AsyncCode extends AsyncTask<URL,Void,String> {
 
         HttpURLConnection UrlConnection=null;
         InputStream inputStream=null;
-        URL url = createURL("https://developers.google.com/oauthplayground/refreshAccessToken");
+        URL url = createURL(UserDetails.TokenUrl);
 
         try {
-            JSONObject postData=getObjects();
-            String jsonString="{\"token_uri\": \"https://oauth2.googleapis.com/token\", \"client_id\": \"350076262266-7qeg2kh5c320fk9k2dt1gb4cp1s2g8c2.apps.googleusercontent.com\",\"client_secret\":\"yzH0WYH68JXWIjuNvBLcX4Oy\",\"refresh_token\":\"1//04KtKnUcd16M4CgYIARAAGAQSNwF-L9IrUoIF6HU7BthQIW8Ny6zqp0y0gWhF5KxC8IIpIxSsfay7lxH4CDdNOAFsCee6rBuudcw\"}";
+            String jsonString="{\"token_uri\": \""+UserDetails.token_uri+"\", \"client_id\": \""+UserDetails.client_id+"\",\"client_secret\":\""+UserDetails.client_secret+"\",\"refresh_token\":\""+UserDetails.refresh_token+"\"}";
             UrlConnection=(HttpURLConnection) url.openConnection();
             UrlConnection.setRequestMethod("POST");
             UrlConnection.setReadTimeout(10000);
@@ -66,7 +67,8 @@ public class AsyncCode extends AsyncTask<URL,Void,String> {
                 response=readFromStream(inputStream);
                 inputStream.close();
             }
-        } catch (IOException | JSONException e) {
+            response=getToken(response);
+        } catch (IOException e) {
             e.printStackTrace();
         }finally {
             if(UrlConnection!=null){
@@ -77,14 +79,7 @@ public class AsyncCode extends AsyncTask<URL,Void,String> {
 
         return response;
     }
-    private JSONObject getObjects() throws JSONException {
-        JSONObject json=new JSONObject();
-        json.put("token_uri","https://oauth2.googleapis.com/token");
-        json.put("client_id","350076262266-7qeg2kh5c320fk9k2dt1gb4cp1s2g8c2.apps.googleusercontent.com");
-        json.put("client_secret","yzH0WYH68JXWIjuNvBLcX4Oy");
-        json.put("refresh_token","1//04KtKnUcd16M4CgYIARAAGAQSNwF-L9IrUoIF6HU7BthQIW8Ny6zqp0y0gWhF5KxC8IIpIxSsfay7lxH4CDdNOAFsCee6rBuudcw");
-        return  json;
-    }
+
     private URL createURL(String StringUrl){
         URL url=null;
         try{
@@ -110,5 +105,22 @@ public class AsyncCode extends AsyncTask<URL,Void,String> {
         }
 
         return output.toString();
+    }
+    private String getToken(String Response){
+        try {
+            JSONObject data= new JSONObject(Response);
+            boolean check=data.getBoolean("success");
+            if(check){
+                String token=data.getString("access_token");
+                return token;}
+            else {
+                return null;
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -2,24 +2,11 @@ package com.example.accmailbot;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.util.Base64;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
-
-
-import java.util.Properties;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         String en=Base64.encodeToString(msg,Base64.CRLF);
         textView.setText(en);
         Log.i("MainActivity: ",  en);
-        AsyncCode Task=new AsyncCode();
+        AsyncGetToken Task=new AsyncGetToken();
         Task.execute();
 
 
