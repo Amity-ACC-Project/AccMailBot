@@ -5,6 +5,7 @@ import android.util.Log;
 
 public class encryptRawData {
 
+
     public static String email ="";
     public static String subject="";
     public static String body="";

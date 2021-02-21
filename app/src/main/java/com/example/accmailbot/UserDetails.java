@@ -3,6 +3,7 @@ package com.example.accmailbot;
 public class UserDetails {
     //Urls
     public static final String TokenUrl="https://developers.google.com/oauthplayground/refreshAccessToken";
+    public static final String PostUrl="https://developers.google.com/oauthplayground/sendRequest";
 
     //Required Data
     public static final String token_uri="https://oauth2.googleapis.com/token";

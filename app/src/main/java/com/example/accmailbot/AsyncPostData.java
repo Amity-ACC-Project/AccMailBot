@@ -1,13 +1,8 @@
 package com.example.accmailbot;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,9 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import com.example.accmailbot.UserDetails;
 
-public class AsyncGetToken extends AsyncTask<URL,Void,String> {
+public class AsyncPostData extends AsyncTask<URL,Void,String> {
 
     @Override
     protected void onPreExecute() {
@@ -35,9 +29,7 @@ public class AsyncGetToken extends AsyncTask<URL,Void,String> {
         if(s==null){
             return ;
         }else {
-            UserDetails.access_token=s;
-
-            Log.i("AsyncResults: ",  UserDetails.access_token);
+            Log.i("PostResults: ",  s);
         }
     }
 
@@ -49,14 +41,17 @@ public class AsyncGetToken extends AsyncTask<URL,Void,String> {
 
         HttpURLConnection UrlConnection=null;
         InputStream inputStream=null;
-        URL url = createURL(UserDetails.TokenUrl);
+        URL url = createURL(UserDetails.PostUrl);
 
         try {
-            String jsonString="{\"token_uri\": \""+UserDetails.token_uri+"\", \"client_id\": \""+UserDetails.client_id+"\",\"client_secret\":\""+UserDetails.client_secret+"\",\"refresh_token\":\""+UserDetails.refresh_token+"\"}";
+            String jsonString="{\"Method\":\"POST\",\"absoluteURI\":\"https://gmail.googleapis.com/gmail/v1/users/me/messages/send\",\"headers\":{\"Content-Type\":\"application/json\",\"Content-Length\":\"202\"},\"message-body\":\"{\\\"raw\\\":\\\""+UserDetails.raw_data+"\\\"}\",\"access_token\":\""+UserDetails.access_token+"\",\"access_token_type\":\"bearer\"}";
             UrlConnection=(HttpURLConnection) url.openConnection();
             UrlConnection.setRequestMethod("POST");
             UrlConnection.setReadTimeout(10000);
             UrlConnection.setConnectTimeout(15000);
+            UrlConnection.setRequestProperty("Host","gmail.googleapis.com");
+            UrlConnection.setRequestProperty("Authorization","Bearer "+UserDetails.access_token);
+            UrlConnection.setRequestProperty("Content-type","application/json");
             try(OutputStream os = UrlConnection.getOutputStream()) {
                 byte[] input = jsonString.getBytes("utf-8");
                 os.write(input, 0, input.length);
@@ -68,7 +63,7 @@ public class AsyncGetToken extends AsyncTask<URL,Void,String> {
                 response=readFromStream(inputStream);
                 inputStream.close();
             }
-            response=getToken(response);
+            //response=getData(response);
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
@@ -107,13 +102,13 @@ public class AsyncGetToken extends AsyncTask<URL,Void,String> {
 
         return output.toString();
     }
-    private String getToken(String Response){
+    private String getData(String Response){
         try {
             JSONObject data= new JSONObject(Response);
-            boolean check=data.getBoolean("success");
-            if(check){
-                String token=data.getString("access_token");
-                return token;}
+            String status=data.getString("Status-Code");
+            if("202".equals(status)){
+                status="sent";
+                return status;}
             else {
                 return null;
             }
