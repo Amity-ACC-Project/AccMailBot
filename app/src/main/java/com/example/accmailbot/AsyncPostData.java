@@ -72,7 +72,7 @@ public class AsyncPostData extends AsyncTask<URL,Void,String> {
             }
 
         }
-
+        Log.i("PostResults: ",  response);
         return response;
     }
 

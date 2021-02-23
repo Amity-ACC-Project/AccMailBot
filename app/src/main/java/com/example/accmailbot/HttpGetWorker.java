@@ -1,13 +1,12 @@
 package com.example.accmailbot;
 
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.Context;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,30 +19,16 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import com.example.accmailbot.UserDetails;
 
-public class AsyncGetToken extends AsyncTask<URL,Void,String> {
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
+public class HttpGetWorker extends Worker {
+    public HttpGetWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
     }
 
+    @NonNull
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        if(s==null){
-            return ;
-        }else {
+    public Result doWork() {
 
-            Log.i("AsyncResults: ",  s);
-        }
-    }
-
-
-
-    @Override
-    protected String doInBackground(URL... urls) {
         String response="";
 
         HttpURLConnection UrlConnection=null;
@@ -70,7 +55,6 @@ public class AsyncGetToken extends AsyncTask<URL,Void,String> {
             }
             response=getToken(response);
             if(response!=null){
-                response=sendMail();
                 Log.i("getTokenResults: ",  UserDetails.access_token);
             }
         } catch (IOException e) {
@@ -81,8 +65,10 @@ public class AsyncGetToken extends AsyncTask<URL,Void,String> {
             }
 
         }
-
-        return response;
+        if(response!=null) {
+            return Result.success();
+        }else
+            return  Result.failure();
     }
 
     private URL createURL(String StringUrl){
@@ -128,44 +114,5 @@ public class AsyncGetToken extends AsyncTask<URL,Void,String> {
             e.printStackTrace();
         }
         return null;
-    }
-    private  String sendMail(){
-        String response="";
-
-        HttpURLConnection UrlConnection=null;
-        InputStream inputStream=null;
-        URL url = createURL(UserDetails.PostUrl);
-
-        try {
-            String jsonString="{\"Method\":\"POST\",\"absoluteURI\":\"https://gmail.googleapis.com/gmail/v1/users/me/messages/send\",\"headers\":{\"Content-Type\":\"application/json\",\"Content-Length\":\"202\"},\"message-body\":\"{\\\"raw\\\":\\\""+UserDetails.raw_data+"\\\"}\",\"access_token\":\""+UserDetails.access_token+"\",\"access_token_type\":\"bearer\"}";
-            UrlConnection=(HttpURLConnection) url.openConnection();
-            UrlConnection.setRequestMethod("POST");
-            UrlConnection.setReadTimeout(10000);
-            UrlConnection.setConnectTimeout(15000);
-            UrlConnection.setRequestProperty("Host","gmail.googleapis.com");
-            UrlConnection.setRequestProperty("Authorization","Bearer "+UserDetails.access_token);
-            UrlConnection.setRequestProperty("Content-type","application/json");
-            try(OutputStream os = UrlConnection.getOutputStream()) {
-                byte[] input = jsonString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-
-            UrlConnection.connect();
-            if(UrlConnection.getResponseCode()==200){
-                inputStream=UrlConnection.getInputStream();
-                response=readFromStream(inputStream);
-                inputStream.close();
-            }
-            //response=getData(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            if(UrlConnection!=null){
-                UrlConnection.disconnect();
-            }
-
-        }
-        Log.i("PostResults: ",  response);
-        return response;
     }
 }
