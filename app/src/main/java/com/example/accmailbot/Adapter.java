@@ -1,4 +1,5 @@
 package com.example.accmailbot;
 
-public class Adapter {//pawan
+public class Adapter {//pawa
+    int i;
 }
