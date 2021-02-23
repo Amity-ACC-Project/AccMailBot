@@ -6,4 +6,5 @@ public class Adapter {
     int j;
     int k;
     //Changed
+    //changed
 }
