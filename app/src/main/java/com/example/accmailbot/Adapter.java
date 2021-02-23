@@ -5,3 +5,4 @@ public class Adapter {//pawannnnnn
     int j;
     //har
 }
+// pawan
