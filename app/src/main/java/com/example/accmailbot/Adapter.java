@@ -6,6 +6,7 @@ public class Adapter {
     int j;
     int k;
     int asdf;
+    
 
     //Changed
     //test change
