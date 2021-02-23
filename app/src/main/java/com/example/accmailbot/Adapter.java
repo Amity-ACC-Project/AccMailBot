@@ -5,5 +5,8 @@ public class Adapter {
     int i;
     int j;
     int k;
+    int asdf;
+
     //Changed
+    //test change
 }
