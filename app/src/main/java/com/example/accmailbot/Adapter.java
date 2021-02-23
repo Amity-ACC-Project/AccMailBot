@@ -1,8 +1,9 @@
 package com.example.accmailbot;
 
-public class Adapter {//pawannnnnn
+public class Adapter {
+    //sahil
     int i;
     int j;
-    //har
+    int k;
+    //Changed
 }
-// pawan here
