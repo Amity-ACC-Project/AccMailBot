@@ -5,7 +5,11 @@ import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -46,6 +50,7 @@ public class HttpRequestWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        String TAG="HTTP Worker";
         String TokenPost="{\"token_uri\": \""+UserDetails.token_uri+"\", \"client_id\": \""+UserDetails.client_id+"\",\"client_secret\":\""+UserDetails.client_secret+"\",\"refresh_token\":\""+UserDetails.refresh_token+"\"}";
 
         URL GetUrl=createURL(UserDetails.TokenUrl);
@@ -65,7 +70,7 @@ public class HttpRequestWorker extends Worker {
             GetCall.enqueue(new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    Log.e("HttpService", "Couldn't get Token: " + e);
+                    Log.e(TAG, "Couldn't get Token: " + e);
 
                     e.printStackTrace();
                 }
@@ -74,16 +79,17 @@ public class HttpRequestWorker extends Worker {
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
 
-                    Log.i("First Worker: ", "This is getToken Worker");
+                    Log.i(TAG, "This is getToken Worker\n");
+                    Log.i(TAG, ""+response.body().toString());
                     try {
                         JSONObject data = new JSONObject(response.body().string());
                         boolean check = data.getBoolean("success");
                         if (check) {
                             String token = data.getString("access_token");
                             UserDetails.access_token = token;
-                            Log.i("Token Found: ", UserDetails.access_token);
+                            Log.i(TAG, UserDetails.access_token);
                         } else {
-                            Log.i("Token Not Found: ", response.body().string());
+                            Log.i(TAG, response.body().string());
                         }
 
 
@@ -92,7 +98,18 @@ public class HttpRequestWorker extends Worker {
                     }
 
                     if (UserDetails.access_token != null) {
+/*
+                        Constraints constraints=new Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build();
+                        WorkRequest PostRequest=new OneTimeWorkRequest.Builder(HttpRequestWorker.class)
+                                .setConstraints(constraints)
+                                .addTag("PostData")
+                                .build();
 
+                        WorkManager.getInstance(getApplicationContext()).enqueue(PostRequest);*/
+                        //String TAG="PostRequest";
+                        Log.i(TAG,"PostRequestWorker Running");
                         OkHttpClient client = new OkHttpClient();
                         URL PostUrl = createURL(UserDetails.PostUrl);
                         String SendPost = "{\"raw\":\"" + UserDetails.raw_data + "\"}";
@@ -111,47 +128,45 @@ public class HttpRequestWorker extends Worker {
                                 .build();
                         Call PostCall;
 
-                        while (HttpRequestWorker.i <= UserDetails.intervals) {
-                            PostCall = client.newCall(PostRequest);
+                        //while (HttpRequestWorker.i <= UserDetails.intervals) {
+                        PostCall = client.newCall(PostRequest);
 
 
-                            PostCall.enqueue(new Callback() {
-                                @Override
-                                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                                    Log.e("HttpService", "Unable to Send: " + e);
+                        PostCall.enqueue(new Callback() {
+                            @Override
+                            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                                Log.e(TAG, "Unable to Send: " + e);
 
-                                    e.printStackTrace();
-                                }
-
-                                @Override
-                                public void onResponse(@NotNull Call call, @NotNull Response r) throws IOException {
-
-
-                                    HttpRequestWorker.response = r.body().string();
-
-
-                                    Log.i("Final Response: ", "" + HttpRequestWorker.response);
-
-
-                                }
-                            });
-
-                            try {
-                                Thread.sleep(2000);
-                                HttpRequestWorker.i++;
-                                if (HttpRequestWorker.response.contains("UNAUTHENTICATED")) {
-
-
-                                } else {
-                                    Log.i("Status", "Confirmed");
-                                    HttpRequestWorker.GetToken = false;
-                                }
-
-
-                            } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
 
+                            @Override
+                            public void onResponse(@NotNull Call call, @NotNull Response r) throws IOException {
+
+
+                                HttpRequestWorker.response = r.body().string();
+
+
+                                Log.i(TAG, "" + HttpRequestWorker.response);
+
+
+                            }
+                        });
+
+                        try {
+                            Thread.sleep(2000);
+                            HttpRequestWorker.i++;
+                            if (HttpRequestWorker.response.contains("UNAUTHENTICATED")) {
+
+
+                            } else {
+                                Log.i(TAG, "Confirmed");
+                                HttpRequestWorker.GetToken = false;
+                            }
+
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
 

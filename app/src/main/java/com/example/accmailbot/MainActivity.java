@@ -34,20 +34,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Data data=new Data.Builder()
-                        .putString("token",UserDetails.access_token)
-                        .build();
+                /*Data data=new Data.Builder()
+                        .putString("Context",MainActivity.this)
+                        .build();*/
                 Constraints constraints=new Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build();
-                WorkRequest PostRequest=new OneTimeWorkRequest.Builder(HttpRequestWorker.class)
-                        .setInputData(data)
+                WorkRequest GetRequest=new OneTimeWorkRequest.Builder(HttpRequestWorker.class)
                         .setConstraints(constraints)
-                        .addTag("PostData")
+                        .addTag("GetData")
                         .build();
 
 
-                WorkManager.getInstance(MainActivity.this).enqueue(PostRequest);
+                WorkManager.getInstance(MainActivity.this).enqueue(GetRequest);
 
 
                 /*WorkManager.getInstance(MainActivity.this).enqueue(Request);
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 
 }
